@@ -221,12 +221,27 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100">
       <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-lg font-black tracking-tighter uppercase italic">CODE<span className="text-orange-600">CFL</span></span>
-        </div>
+       <div className="flex items-center gap-2">
+  <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+    <LayoutDashboard className="w-5 h-5 text-white" />
+  </div>
+  <span className="text-lg font-black tracking-tighter uppercase italic">
+    {mounted && currentDomain ? (
+      <>
+        {/* Tách lấy phần REDEEM- */}
+        {currentDomain.split("CFLVN")[0]}
+        <span className="text-orange-600">
+          {/* Tô cam từ CFLVN đến hết (.VERCEL.APP) */}
+          CFLVN{currentDomain.split("CFLVN")[1]}
+        </span>
+      </>
+    ) : (
+      // Hiển thị tạm khi đang load
+      <>REDEEM-<span className="text-orange-600"></span></>
+    )}
+  </span>
+</div>
+
         <div className="flex items-center gap-2">
           <Dialog>
             <DialogTrigger asChild>
