@@ -215,7 +215,7 @@ export default function Home() {
     toast.success("Xử lý hoàn tất!")
   }
 
-  const currentDomain = mounted ? window.location.hostname.toUpperCase() : "AUTONHAPCODECFL.VN"
+  const currentDomain = mounted ? window.location.hostname.toUpperCase() : ""
   const currentYear = mounted ? new Date().getFullYear() : 2026
 
   return (
