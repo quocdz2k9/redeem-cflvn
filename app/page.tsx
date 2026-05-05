@@ -225,14 +225,15 @@ export default function Home() {
   <div className="w-9 h-9 bg-orange-600 rounded-xl flex items-center justify-center shrink-0">
     <LayoutDashboard className="w-5 h-5 text-white" />
   </div>
-  <div className="flex flex-col justify-center -space-y-1.5">
-    <span className="text-xl font-black tracking-tighter uppercase italic leading-none">
-      CÔNG <span className="text-orange-600">CỤ</span>
-    </span>
-    <span className="text-[9px] font-bold tracking-widest uppercase opacity-60 dark:opacity-40 italic">
-      Auto Nhập Code CFL
-    </span>
-  </div>
+ <div className="flex flex-col justify-center">
+  <span className="text-xl font-black tracking-tighter uppercase italic leading-[1.1]">
+    CÔNG <span className="text-orange-600">CỤ</span>
+  </span>
+  <span className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-70 dark:opacity-50 italic">
+    Auto Nhập Code CFL
+  </span>
+</div>
+
 </div>
         <div className="flex items-center gap-2">
           <Dialog>
