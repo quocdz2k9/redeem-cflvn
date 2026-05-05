@@ -221,27 +221,19 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100">
       <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
-       <div className="flex items-center gap-2">
-  <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+      <div className="flex items-center gap-2">
+  <div className="w-9 h-9 bg-orange-600 rounded-xl flex items-center justify-center shrink-0">
     <LayoutDashboard className="w-5 h-5 text-white" />
   </div>
-  <span className="text-lg font-black tracking-tighter uppercase italic">
-    {mounted && currentDomain ? (
-      <>
-        {/* Tách lấy phần REDEEM- */}
-        {currentDomain.split("CFLVN")[0]}
-        <span className="text-orange-600">
-          {/* Tô cam từ CFLVN đến hết (.VERCEL.APP) */}
-          CFLVN{currentDomain.split("CFLVN")[1]}
-        </span>
-      </>
-    ) : (
-      // Hiển thị tạm khi đang load
-      <>REDEEM-<span className="text-orange-600"></span></>
-    )}
-  </span>
+  <div className="flex flex-col justify-center -space-y-1.5">
+    <span className="text-xl font-black tracking-tighter uppercase italic leading-none">
+      CÔNG <span className="text-orange-600">CỤ</span>
+    </span>
+    <span className="text-[9px] font-bold tracking-widest uppercase opacity-60 dark:opacity-40 italic">
+      Auto Nhập Code CFL
+    </span>
+  </div>
 </div>
-
         <div className="flex items-center gap-2">
           <Dialog>
             <DialogTrigger asChild>
