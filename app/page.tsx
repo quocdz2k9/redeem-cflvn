@@ -48,7 +48,6 @@ export default function Home() {
     fail: logs.filter(l => l.status === "Thất bại" || l.status === "Lỗi").length
   }), [logs])
 
-  // Hàm tạo vân tay trình duyệt (Fingerprint) để định danh người dùng không cần thư viện
   const generateFingerprint = () => {
     const gl = document.createElement('canvas').getContext('webgl')
     const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info')
@@ -64,35 +63,27 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    
-    // Khởi tạo Visitor ID duy nhất
     let vId = localStorage.getItem("cfl_visitor_id")
     if (!vId) {
       vId = generateFingerprint()
       localStorage.setItem("cfl_visitor_id", vId)
     }
 
-    // Load danh sách ID đã lưu
     const savedIds = localStorage.getItem("cfl_validated_ids")
     if (savedIds) {
       try {
         setValidatedIds(JSON.parse(savedIds))
-      } catch (e) {
-        console.error(e)
-      }
+      } catch (e) {}
     }
 
     const fetchStats = async () => {
       try {
-        // Sử dụng vId cố định để tránh tăng ảo khi F5
         await supabase.from('ActiveUser').upsert({ 
           id: vId, 
           lastseen: new Date().toISOString() 
         })
 
         const { data: systemStats } = await supabase.from('SystemStat').select('value').eq('key', 'total_redeems').single()
-        
-        // Đếm số người online trong 30 giây qua
         const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString()
         const { count: onlineCount } = await supabase.from('ActiveUser')
           .select('*', { count: 'exact', head: true })
@@ -103,9 +94,7 @@ export default function Home() {
           online: onlineCount || 1
         })
         setIsStatsLoading(false)
-      } catch (e) {
-        console.error("Stats Error:", e)
-      }
+      } catch (e) {}
     }
 
     fetchStats()
@@ -220,7 +209,6 @@ export default function Home() {
       }
     }
 
-    // Chỉ tăng 1 lượt sử dụng cho mỗi lần nhấn nút chạy xong
     await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: 1 })
 
     setIsLoading(false)
@@ -284,7 +272,7 @@ export default function Home() {
             <div>
               <p className="text-[9px] font-black uppercase text-zinc-400 tracking-tighter">Đang truy cập</p>
               <p className="text-lg font-black text-zinc-900 dark:text-white">
-                {isStatsLoading ? <span className="text-[10px] animate-pulse">ĐANG TẢI...</span> : statsRealtime.online}
+                {isStatsLoading ? <span className="text-[10px] animate-pulse">...</span> : statsRealtime.online}
               </p>
             </div>
           </div>
@@ -295,7 +283,7 @@ export default function Home() {
             <div>
               <p className="text-[9px] font-black uppercase text-zinc-400 tracking-tighter">Đã sử dụng</p>
               <p className="text-lg font-black text-zinc-900 dark:text-white">
-                {isStatsLoading ? <span className="text-[10px] animate-pulse">ĐANG TẢI...</span> : statsRealtime.total.toLocaleString()}
+                {isStatsLoading ? <span className="text-[10px] animate-pulse">...</span> : statsRealtime.total.toLocaleString()}
               </p>
             </div>
           </div>
