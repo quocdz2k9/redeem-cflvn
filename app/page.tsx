@@ -48,8 +48,31 @@ export default function Home() {
     fail: logs.filter(l => l.status === "Thất bại" || l.status === "Lỗi").length
   }), [logs])
 
+  // Hàm tạo vân tay trình duyệt (Fingerprint) để định danh người dùng không cần thư viện
+  const generateFingerprint = () => {
+    const gl = document.createElement('canvas').getContext('webgl')
+    const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info')
+    const renderer = debugInfo ? gl?.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : ""
+    const str = `${navigator.userAgent}|${screen.width}x${screen.height}|${navigator.language}|${renderer}`
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i)
+      hash |= 0
+    }
+    return Math.abs(hash).toString(36)
+  }
+
   useEffect(() => {
     setMounted(true)
+    
+    // Khởi tạo Visitor ID duy nhất
+    let vId = localStorage.getItem("cfl_visitor_id")
+    if (!vId) {
+      vId = generateFingerprint()
+      localStorage.setItem("cfl_visitor_id", vId)
+    }
+
+    // Load danh sách ID đã lưu
     const savedIds = localStorage.getItem("cfl_validated_ids")
     if (savedIds) {
       try {
@@ -59,21 +82,30 @@ export default function Home() {
       }
     }
 
-    const visitorId = Math.random().toString(36).substring(7)
-
     const fetchStats = async () => {
       try {
-        await supabase.from('ActiveUser').upsert({ id: visitorId, lastseen: new Date().toISOString() })
+        // Sử dụng vId cố định để tránh tăng ảo khi F5
+        await supabase.from('ActiveUser').upsert({ 
+          id: vId, 
+          lastseen: new Date().toISOString() 
+        })
+
         const { data: systemStats } = await supabase.from('SystemStat').select('value').eq('key', 'total_redeems').single()
+        
+        // Đếm số người online trong 30 giây qua
         const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString()
-        const { count: onlineCount } = await supabase.from('ActiveUser').select('*', { count: 'exact', head: true }).gte('lastseen', thirtySecondsAgo)
+        const { count: onlineCount } = await supabase.from('ActiveUser')
+          .select('*', { count: 'exact', head: true })
+          .gte('lastseen', thirtySecondsAgo)
         
         setStatsRealtime({
           total: systemStats?.value || 0,
           online: onlineCount || 1
         })
         setIsStatsLoading(false)
-      } catch (e) {}
+      } catch (e) {
+        console.error("Stats Error:", e)
+      }
     }
 
     fetchStats()
@@ -137,7 +169,6 @@ export default function Home() {
     if (!isNumeric(id)) return setModalError("ID không hợp lệ")
     setIsValidating(true)
     try {
-      await new Promise(r => setTimeout(r, 1000))
       const result = await checkRoleApi(id)
       if (result.returnCode === 1) {
         if (!validatedIds.some(item => item.id === id)) {
@@ -189,6 +220,7 @@ export default function Home() {
       }
     }
 
+    // Chỉ tăng 1 lượt sử dụng cho mỗi lần nhấn nút chạy xong
     await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: 1 })
 
     setIsLoading(false)
@@ -211,9 +243,7 @@ export default function Home() {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-orange-600 flex items-center justify-center gap-2 h-9 px-3 transition-none active:scale-95">
-                <div className="flex h-4 w-4 items-center justify-center">
-                  <Coffee className="h-4 w-4" />
-                </div>
+                <Coffee className="h-4 w-4" />
                 <span className="min-w-[90px] text-left font-bold text-[11px] uppercase tracking-tighter">Ủng hộ Admin</span>
               </Button>
             </DialogTrigger>
@@ -409,4 +439,3 @@ export default function Home() {
     </div>
   )
 }
-
