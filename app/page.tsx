@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { toast } from "sonner"
-import { 
-  Loader2, Users, ClipboardList, Trash2, PlusCircle, 
-  LayoutDashboard, Terminal, Coffee, Heart, ShoppingBag, 
-  ExternalLink, Activity, Zap 
+import {
+  Loader2, Users, ClipboardList, Trash2, PlusCircle,
+  LayoutDashboard, Terminal, Coffee, Heart, ShoppingBag,
+  ExternalLink, Activity, Zap
 } from "lucide-react"
 import {
   Dialog,
@@ -19,7 +19,6 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog"
-
 import { DEFAULT_CODES, ERROR_MESSAGES } from "./constants/redeem"
 import { Footer } from "@/components/Footer"
 import { createClient } from "@/utils/supabase/client"
@@ -41,7 +40,7 @@ export default function Home() {
   const [validatedIds, setValidatedIds] = useState<{ id: string, name: string }[]>([])
   const [mounted, setMounted] = useState(false)
   const [statsRealtime, setStatsRealtime] = useState({ total: 0, online: 1 })
-  const [visitorId, setVisitorId] = useState("")
+  const [isStatsLoading, setIsStatsLoading] = useState(true)
 
   const stats = useMemo(() => ({
     total: logs.length,
@@ -51,20 +50,29 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    const id = Math.random().toString(36).substring(7)
-    setVisitorId(id)
+    const savedIds = localStorage.getItem("cfl_validated_ids")
+    if (savedIds) {
+      try {
+        setValidatedIds(JSON.parse(savedIds))
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    const visitorId = Math.random().toString(36).substring(7)
 
     const fetchStats = async () => {
       try {
-        await supabase.from('ActiveUser').upsert({ id: id, lastSeen: new Date().toISOString() })
+        await supabase.from('ActiveUser').upsert({ id: visitorId, lastseen: new Date().toISOString() })
         const { data: systemStats } = await supabase.from('SystemStat').select('value').eq('key', 'total_redeems').single()
         const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString()
-        const { count: onlineCount } = await supabase.from('ActiveUser').select('*', { count: 'exact', head: true }).gte('lastSeen', thirtySecondsAgo)
-
+        const { count: onlineCount } = await supabase.from('ActiveUser').select('*', { count: 'exact', head: true }).gte('lastseen', thirtySecondsAgo)
+        
         setStatsRealtime({
           total: systemStats?.value || 0,
           online: onlineCount || 1
         })
+        setIsStatsLoading(false)
       } catch (e) {}
     }
 
@@ -72,6 +80,12 @@ export default function Home() {
     const interval = setInterval(fetchStats, 15000)
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("cfl_validated_ids", JSON.stringify(validatedIds))
+    }
+  }, [validatedIds, mounted])
 
   useEffect(() => {
     const lineCount = codesInput.split("\n").filter(line => line.trim() !== "").length
@@ -121,7 +135,6 @@ export default function Home() {
     const id = tempIdInput.trim()
     if (!id) return setModalError("Vui lòng nhập ID")
     if (!isNumeric(id)) return setModalError("ID không hợp lệ")
-
     setIsValidating(true)
     try {
       await new Promise(r => setTimeout(r, 1000))
@@ -149,8 +162,6 @@ export default function Home() {
 
     setIsLoading(true)
     setLogs([])
-    
-    let successCount = 0
 
     for (const code of listCodes) {
       const currentTime = new Date().toLocaleTimeString('vi-VN', { hour12: false })
@@ -166,8 +177,6 @@ export default function Home() {
         const result = await response.json()
         const rawMsg = result.message || "Unknown"
         
-        if (rawMsg === "Success") successCount++
-
         setLogs(prev => [{
           code,
           status: rawMsg === "Success" ? "Thành công" : "Thất bại",
@@ -180,9 +189,7 @@ export default function Home() {
       }
     }
 
-    if (successCount > 0) {
-      await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: successCount })
-    }
+    await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: 1 })
 
     setIsLoading(false)
     toast.success("Xử lý hoàn tất!")
@@ -246,7 +253,9 @@ export default function Home() {
             </div>
             <div>
               <p className="text-[9px] font-black uppercase text-zinc-400 tracking-tighter">Đang truy cập</p>
-              <p className="text-lg font-black text-zinc-900 dark:text-white">{statsRealtime.online}</p>
+              <p className="text-lg font-black text-zinc-900 dark:text-white">
+                {isStatsLoading ? <span className="text-[10px] animate-pulse">ĐANG TẢI...</span> : statsRealtime.online}
+              </p>
             </div>
           </div>
           <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-[24px] p-4 flex items-center gap-4 shadow-sm">
@@ -255,7 +264,9 @@ export default function Home() {
             </div>
             <div>
               <p className="text-[9px] font-black uppercase text-zinc-400 tracking-tighter">Đã sử dụng</p>
-              <p className="text-lg font-black text-zinc-900 dark:text-white">{statsRealtime.total.toLocaleString()}</p>
+              <p className="text-lg font-black text-zinc-900 dark:text-white">
+                {isStatsLoading ? <span className="text-[10px] animate-pulse">ĐANG TẢI...</span> : statsRealtime.total.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -398,3 +409,4 @@ export default function Home() {
     </div>
   )
 }
+
