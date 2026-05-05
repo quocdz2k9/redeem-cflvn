@@ -11,3 +11,15 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model SystemStat {
+  id    Int    @id @default(1)
+  key   String @unique // Ví dụ: "total_redeems"
+  value Int    @default(0)
+}
+
+model ActiveUser {
+  id        String   @id @default(uuid())
+  lastSeen  DateTime @default(now())
+}
+
