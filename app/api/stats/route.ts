@@ -1,33 +1,30 @@
 import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma" // Đảm bảo bạn đã export prisma client
+import { createClient } from "@/utils/supabase/server"
 
 export async function GET() {
+  const supabase = await createClient()
 
-  const totalRedeems = await prisma.systemStat.findUnique({
-    where: { key: "total_redeems" }
-  })
+  try {
+    // Lấy tổng lượt redeem
+    const { data: systemStats } = await supabase
+      .from('SystemStat')
+      .select('value')
+      .eq('key', 'total_redeems')
+      .single()
 
-  const thirtySecondsAgo = new Date(Date.now() - 30 * 1000)
-  const onlineCount = await prisma.activeUser.count({
-    where: { lastSeen: { gte: thirtySecondsAgo } }
-  })
+    // Đếm số người online (lastSeen trong vòng 30 giây)
+    const thirtySecondsAgo = new Date(Date.now() - 30 * 1000).toISOString()
+    const { count: onlineCount } = await supabase
+      .from('ActiveUser')
+      .select('*', { count: 'exact', head: true })
+      .gte('lastSeen', thirtySecondsAgo)
 
-  return NextResponse.json({
-    total: totalRedeems?.value || 0,
-    online: onlineCount || 1
-  })
-}
-
-export async function POST(req: Request) {
-  const { visitorId } = await req.json()
-  if (!visitorId) return NextResponse.json({ ok: false })
-
-  await prisma.activeUser.upsert({
-    where: { id: visitorId },
-    update: { lastSeen: new Date() },
-    create: { id: visitorId, lastSeen: new Date() }
-  })
-
-  return NextResponse.json({ ok: true })
+    return NextResponse.json({
+      total: systemStats?.value || 0,
+      online: onlineCount || 1
+    })
+  } catch (error) {
+    return NextResponse.json({ total: 0, online: 1 }, { status: 500 })
+  }
 }
 
