@@ -22,7 +22,7 @@ import {
 import { DEFAULT_CODES, ERROR_MESSAGES } from "./constants/redeem"
 import { Footer } from "@/components/Footer"
 import { createClient } from "@/utils/supabase/client"
-
+import { Navbar } from "@/components/Navbar"
 export default function Home() {
   const supabase = createClient()
   const [roleId, setRoleId] = useState("")
@@ -218,58 +218,10 @@ export default function Home() {
   const currentDomain = mounted ? window.location.hostname.toUpperCase() : ""
   const currentYear = mounted ? new Date().getFullYear() : 2026
 
-  return (
+ return (
     <div className="flex flex-col min-h-screen bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100">
-      <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
-      <div className="flex items-center gap-2">
-  <div className="w-9 h-9 bg-orange-600 rounded-xl flex items-center justify-center shrink-0">
-    <LayoutDashboard className="w-5 h-5 text-white" />
-  </div>
- <div className="flex flex-col justify-center">
-  <span className="text-xl font-black tracking-tighter uppercase italic leading-[1.1]">
-    CÔNG <span className="text-orange-600">CỤ</span>
-  </span>
-  <span className="text-[9px] font-bold tracking-[0.15em] uppercase opacity-70 dark:opacity-50 italic">
-    Auto Nhập Code CFL
-  </span>
-</div>
-
-</div>
-        <div className="flex items-center gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="rounded-xl border-zinc-200 dark:border-zinc-800 text-orange-600 flex items-center justify-center gap-2 h-9 px-3 transition-none active:scale-95">
-                <Coffee className="h-4 w-4" />
-                <span className="min-w-[90px] text-left font-bold text-[11px] uppercase tracking-tighter">Ủng hộ Admin</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[380px] rounded-[32px] border-none shadow-2xl dark:bg-zinc-950 overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-orange-600" />
-              <DialogHeader className="pt-4 px-6 text-center space-y-3">
-                <DialogTitle className="font-black flex flex-col items-center gap-2">
-                  <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center">
-                    <Heart className="w-6 h-6 text-orange-600 fill-orange-600 animate-pulse" />
-                  </div>
-                  ỦNG HỘ ADMIN
-                </DialogTitle>
-                <DialogDescription className="text-[11px] font-bold leading-relaxed">Nếu thấy tool hữu ích, hãy mời admin một ly cà phê để duy trì máy chủ và phát triển thêm nhiều tính năng mới nhé!</DialogDescription>
-              </DialogHeader>
-              <div className="flex flex-col items-center space-y-4 py-4">
-                <img src="https://img.vietqr.io/image/VPB-0825966162-compact.png" alt="QR" className="w-44 h-44 rounded-2xl border dark:border-zinc-800 p-1 bg-white" />
-                <div className="w-full px-6 space-y-2 font-bold">
-                  {[["Ngân hàng", "VP Bank"], ["Chủ TK", "TRAN MINH QUOC"], ["Số TK", "0825966162"]].map(([k, v]) => (
-                    <div key={k} className="flex justify-between p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border dark:border-zinc-800 text-[11px]">
-                      <span className="text-zinc-400 uppercase tracking-tighter">{k}</span>
-                      <span className="uppercase">{v}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <ThemeToggle />
-        </div>
-      </nav>
+      {/* Navbar mới đây */}
+      <Navbar /> 
 
       <main className="flex-1 p-4 max-w-2xl mx-auto w-full space-y-6 mt-4">
         <div className="grid grid-cols-2 gap-3">
