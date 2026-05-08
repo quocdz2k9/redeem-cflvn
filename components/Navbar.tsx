@@ -1,6 +1,7 @@
 "use client"
 import React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation" // Thêm hook này
 import { 
   LayoutDashboard, 
   Menu, 
@@ -30,11 +31,12 @@ import {
 } from "@/components/ui/dialog"
 
 export function Navbar() {
+  const pathname = usePathname() // Lấy đường dẫn hiện tại (ví dụ: "/" hoặc "/heros")
+
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
       {/* LEFT: LOGO */}
       <div className="flex items-center gap-3">
-        {/* Menu 3 gạch cho Mobile */}
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-xl lg:hidden active:scale-95 transition-transform">
@@ -55,19 +57,40 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="flex flex-col gap-2">
-                <MenuLink href="/" icon={<Home className="w-4 h-4" />} title="Trang chủ" active />
-                <MenuLink href="/heros" icon={<UserCircle className="w-4 h-4" />} title="Thư viện Heroes" />
-                <MenuLink href="#" icon={<History className="w-4 h-4" />} title="Lịch sử nhập code" />
-                <MenuLink href="#" icon={<Shield className="w-4 h-4" />} title="Chính sách bảo mật" />
+                {/* Tự động check active dựa trên pathname */}
+                <MenuLink 
+                  href="/" 
+                  icon={<Home className="w-4 h-4" />} 
+                  title="Trang chủ" 
+                  active={pathname === "/"} 
+                />
+                <MenuLink 
+                  href="/heros" 
+                  icon={<UserCircle className="w-4 h-4" />} 
+                  title="Thư viện Heroes" 
+                  active={pathname === "/heros"} 
+                />
+                <MenuLink 
+                  href="/history" 
+                  icon={<History className="w-4 h-4" />} 
+                  title="Lịch sử nhập code" 
+                  active={pathname === "/history"} 
+                />
+                <MenuLink 
+                  href="/policy" 
+                  icon={<Shield className="w-4 h-4" />} 
+                  title="Chính sách bảo mật" 
+                  active={pathname === "/policy"} 
+                />
               </div>
 
               <div className="pt-6 border-t dark:border-zinc-900">
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 px-3">Cộng đồng</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <a href="https://shopcfl.com" target="_blank" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold">
+                  <a href="https://shopcfl.com" target="_blank" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors">
                     Shop CFL
                   </a>
-                  <a href="#" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold">
+                  <a href="#" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors">
                     Zalo Admin
                   </a>
                 </div>
@@ -76,8 +99,8 @@ export function Navbar() {
           </SheetContent>
         </Sheet>
 
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-9 h-9 bg-orange-600 rounded-xl flex items-center justify-center shrink-0">
+        <Link href="/" className="flex items-center gap-2 active:scale-95 transition-transform">
+          <div className="w-9 h-9 bg-orange-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-600/20">
             <LayoutDashboard className="w-5 h-5 text-white" />
           </div>
           <div className="flex flex-col justify-center">
@@ -93,7 +116,6 @@ export function Navbar() {
 
       {/* RIGHT: ACTIONS */}
       <div className="flex items-center gap-2">
-        {/* Nút ủng hộ tách riêng */}
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="hidden md:flex rounded-xl border-zinc-200 dark:border-zinc-800 text-orange-600 h-9 px-4 active:scale-95 transition-all">
@@ -110,7 +132,7 @@ export function Navbar() {
                 </div>
                 ỦNG HỘ ADMIN
               </DialogTitle>
-              <DialogDescription className="text-[11px] font-bold">Mời admin một ly cà phê nhé Quốc!</DialogDescription>
+              <DialogDescription className="text-[11px] font-bold">Mời admin một ly cà phê nhé!</DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center p-6 pt-2">
               <img src="https://img.vietqr.io/image/VPB-0825966162-compact.png" alt="QR" className="w-44 h-44 rounded-2xl border bg-white p-1 mb-4" />
@@ -130,15 +152,18 @@ export function Navbar() {
   )
 }
 
+// Giữ nguyên MenuLink nhưng tối ưu CSS một chút
 function MenuLink({ href, icon, title, active = false }: { href: string, icon: React.ReactNode, title: string, active?: boolean }) {
   return (
     <Link href={href}>
-      <div className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-bold transition-all ${
+      <div className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-bold transition-all duration-200 active:scale-95 ${
         active 
-        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20" 
+        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2" 
         : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-orange-600"
       }`}>
-        {icon}
+        <div className={`${active ? "text-white" : "text-zinc-400 group-hover:text-orange-600"}`}>
+          {icon}
+        </div>
         {title}
       </div>
     </Link>
