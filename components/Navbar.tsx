@@ -1,7 +1,7 @@
 "use client"
-import React from "react"
+import React, { useState } from "react" // Thêm useState
 import Link from "next/link"
-import { usePathname } from "next/navigation" // Thêm hook này
+import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, 
   Menu, 
@@ -31,13 +31,15 @@ import {
 } from "@/components/ui/dialog"
 
 export function Navbar() {
-  const pathname = usePathname() // Lấy đường dẫn hiện tại (ví dụ: "/" hoặc "/heros")
+  const pathname = usePathname()
+  // Quản lý trạng thái đóng/mở của Sheet
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
-      {/* LEFT: LOGO */}
       <div className="flex items-center gap-3">
-        <Sheet>
+        {/* Truyền open và onOpenChange vào Sheet */}
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-xl lg:hidden active:scale-95 transition-transform">
               <Menu className="w-6 h-6 text-zinc-600 dark:text-zinc-400" />
@@ -57,40 +59,44 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="flex flex-col gap-2">
-                {/* Tự động check active dựa trên pathname */}
+                {/* Khi bấm vào MenuLink thì gọi setIsOpen(false) để đóng menu */}
                 <MenuLink 
                   href="/" 
                   icon={<Home className="w-4 h-4" />} 
                   title="Trang chủ" 
                   active={pathname === "/"} 
+                  onClick={() => setIsOpen(false)}
                 />
                 <MenuLink 
                   href="/heros" 
                   icon={<UserCircle className="w-4 h-4" />} 
                   title="Thư viện Heroes" 
                   active={pathname === "/heros"} 
+                  onClick={() => setIsOpen(false)}
                 />
                 <MenuLink 
                   href="/history" 
                   icon={<History className="w-4 h-4" />} 
                   title="Lịch sử nhập code" 
                   active={pathname === "/history"} 
+                  onClick={() => setIsOpen(false)}
                 />
                 <MenuLink 
                   href="/policy" 
                   icon={<Shield className="w-4 h-4" />} 
                   title="Chính sách bảo mật" 
                   active={pathname === "/policy"} 
+                  onClick={() => setIsOpen(false)}
                 />
               </div>
 
               <div className="pt-6 border-t dark:border-zinc-900">
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-4 px-3">Cộng đồng</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <a href="https://shopcfl.com" target="_blank" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors">
+                  <a href="https://shopcfl.com" target="_blank" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors" onClick={() => setIsOpen(false)}>
                     Shop CFL
                   </a>
-                  <a href="#" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors">
+                  <a href="#" className="p-3 bg-zinc-50 dark:bg-zinc-900 rounded-2xl flex flex-col items-center gap-2 text-[10px] font-bold hover:text-orange-600 transition-colors" onClick={() => setIsOpen(false)}>
                     Zalo Admin
                   </a>
                 </div>
@@ -114,7 +120,6 @@ export function Navbar() {
         </Link>
       </div>
 
-      {/* RIGHT: ACTIONS */}
       <div className="flex items-center gap-2">
         <Dialog>
           <DialogTrigger asChild>
@@ -152,10 +157,22 @@ export function Navbar() {
   )
 }
 
-// Giữ nguyên MenuLink nhưng tối ưu CSS một chút
-function MenuLink({ href, icon, title, active = false }: { href: string, icon: React.ReactNode, title: string, active?: boolean }) {
+// Update MenuLink để nhận thêm prop onClick
+function MenuLink({ 
+  href, 
+  icon, 
+  title, 
+  active = false, 
+  onClick 
+}: { 
+  href: string, 
+  icon: React.ReactNode, 
+  title: string, 
+  active?: boolean,
+  onClick?: () => void
+}) {
   return (
-    <Link href={href}>
+    <Link href={href} onClick={onClick}>
       <div className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-bold transition-all duration-200 active:scale-95 ${
         active 
         ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2" 

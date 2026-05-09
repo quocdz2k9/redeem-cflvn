@@ -6,7 +6,7 @@ import {
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { Navbar } from "@/components/Navbar" // Import Navbar đã tách
+import { Navbar } from "@/components/Navbar"
 
 const HERO_DATABASE = [
   { id: "sicarios", name: "Sicarios", img: "1.png" },
@@ -58,17 +58,14 @@ export default function HeroesPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 pb-20">
-      {/* 1. SỬ DỤNG NAVBAR CHUNG */}
       <Navbar />
 
       <main className="max-w-2xl mx-auto p-4 mt-6 space-y-6">
-        {/* TIÊU ĐỀ TRANG (Optional - vì Navbar đã có title rồi nhưng nếu muốn nhấn mạnh thì thêm vào) */}
         <div className="px-1 mb-2">
            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.2em]">Khám phá nhân vật</span>
            <h1 className="text-2xl font-black italic uppercase tracking-tighter mt-1">THƯ VIỆN <span className="text-orange-600">HEROES</span></h1>
         </div>
 
-        {/* SEARCH BAR */}
         <div className="relative group">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-orange-600 w-5 h-5 transition-colors" />
           <Input 
@@ -84,7 +81,6 @@ export default function HeroesPage() {
           )}
         </div>
 
-        {/* EMPTY STATE */}
         {filteredHeroes.length === 0 && (
           <div className="py-20 flex flex-col items-center justify-center opacity-40">
             <SearchX className="w-12 h-12 mb-4" />
@@ -92,7 +88,6 @@ export default function HeroesPage() {
           </div>
         )}
 
-        {/* HERO GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           {filteredHeroes.map((hero) => (
             <div 
@@ -113,7 +108,6 @@ export default function HeroesPage() {
         </div>
       </main>
 
-      {/* MODAL CHI TIẾT NHÂN VẬT */}
       <Dialog open={!!selectedHero} onOpenChange={() => setSelectedHero(null)}>
         <DialogContent className="sm:max-w-[400px] w-[94vw] rounded-[32px] border-none bg-white dark:bg-zinc-950 p-0 overflow-hidden shadow-2xl focus:outline-none">
           <DialogTitle className="sr-only">{selectedHero?.title || "Chi tiết nhân vật"}</DialogTitle>
@@ -121,7 +115,6 @@ export default function HeroesPage() {
           {selectedHero && (
             <div className="relative flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar">
               
-              {/* PHẦN HEADER CHỨA BACKGROUND VÀ CHARACTER */}
               <div className="relative h-[280px] w-full shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
                 <picture className="absolute inset-0 w-full h-full">
                   <source media="(max-width: 640px)" srcSet="https://cdn-mainsite-aka.vnggames.com/products/cfl/mainsite/dist/assets/libraryMainsite-t-popup/images/bg-mb.png" />
@@ -140,7 +133,8 @@ export default function HeroesPage() {
                   />
                 </div>
 
-                <div className="absolute bottom-4 left-6 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-xl border border-white/10">
+                {/* FIX: Đẩy Badge lên cao một chút (bottom-10) để không bị dính vào phần Info bên dưới */}
+                <div className="absolute bottom-10 left-6 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-xl border border-white/10 shadow-lg">
                   <ShieldCheck className="w-3.5 h-3.5 text-orange-500" />
                   <span className="text-[9px] font-black uppercase tracking-widest">
                     {selectedHero.otherImgArr?.title || "Vĩnh viễn"}
@@ -148,8 +142,7 @@ export default function HeroesPage() {
                 </div>
               </div>
 
-              {/* THÔNG TIN CHI TIẾT */}
-              <div className="p-6 space-y-6 relative bg-white dark:bg-zinc-950 rounded-t-[32px] -mt-6 z-30">
+              <div className="p-6 space-y-6 relative bg-white dark:bg-zinc-950 rounded-t-[32px] -mt-6 z-30 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
                 <div>
                   <h2 className="text-3xl font-black uppercase italic tracking-tighter text-zinc-900 dark:text-white leading-none">
                     {selectedHero.title}
@@ -160,7 +153,6 @@ export default function HeroesPage() {
                   </div>
                 </div>
 
-                {/* Skin Selector */}
                 <div className="space-y-3">
                    <div className="text-[9px] font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest px-1 flex items-center gap-2">
                      <div className="w-1.5 h-1.5 bg-orange-600 rounded-full" /> Danh sách ngoại trang
@@ -208,12 +200,12 @@ export default function HeroesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* LOADING OVERLAY */}
+      {/* LOADING OVERLAY - Đã cập nhật text */}
       {loading && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
           <div className="bg-white dark:bg-zinc-950 p-6 rounded-[32px] shadow-2xl flex flex-col items-center gap-3 border dark:border-zinc-800">
             <Loader2 className="w-8 h-8 text-orange-600 animate-spin" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-orange-600">Đang truy xuất dữ liệu...</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-orange-600">Đang tải hồ sơ...</span>
           </div>
         </div>
       )}
