@@ -13,7 +13,8 @@ import {
   Home,
   Shield,
   Sword,
-  Map as MapIcon // Import icon cho Maps
+  Map as MapIcon,
+  UserSearch // Icon cho mục Check Role
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -67,6 +68,14 @@ export function Navbar() {
                   active={pathname === "/"}
                   onClick={() => setIsOpen(false)}
                 />
+                {/* MỤC MỚI: CHECK ROLE */}
+                <MenuLink
+                  href="/check"
+                  icon={<UserSearch className="w-4 h-4" />}
+                  title="Check Thông tin acc"
+                  active={pathname === "/check"}
+                  onClick={() => setIsOpen(false)}
+                />
                 <MenuLink
                   href="/heros"
                   icon={<UserCircle className="w-4 h-4" />}
@@ -81,7 +90,6 @@ export function Navbar() {
                   active={pathname === "/weapon"}
                   onClick={() => setIsOpen(false)}
                 />
-                {/* MỤC MỚI: THƯ VIỆN MAPS */}
                 <MenuLink
                   href="/maps"
                   icon={<MapIcon className="w-4 h-4" />}
@@ -89,6 +97,7 @@ export function Navbar() {
                   active={pathname === "/maps"}
                   onClick={() => setIsOpen(false)}
                 />
+                <hr className="my-2 border-zinc-100 dark:border-zinc-900" />
                 <MenuLink
                   href="/history"
                   icon={<History className="w-4 h-4" />}
@@ -193,7 +202,7 @@ function MenuLink({
           ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2"
           : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-orange-600"
       }`}>
-        <div className={`${active ? "text-white" : "text-zinc-400"}`}>
+        <div className={`${active ? "text-white" : "text-zinc-400 group-hover:text-orange-600"}`}>
           {icon}
         </div>
         {title}
@@ -201,3 +210,4 @@ function MenuLink({
     </Link>
   )
 }
+
