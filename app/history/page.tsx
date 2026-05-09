@@ -121,14 +121,16 @@ export default function HistoryPage() {
             >
               <Download className="w-3.5 h-3.5 mr-2" /> XUẤT FILE
             </Button>
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              className="rounded-xl font-bold text-[10px] h-10 bg-rose-600 hover:bg-rose-700"
-              onClick={clearHistory}
-            >
-              <Trash2 className="w-3.5 h-3.5 mr-2" /> XOÁ HẾT
-            </Button>
+           <Button
+  variant="destructive"
+  size="default" // Đổi từ sm sang default để có không gian chứa text tốt hơn
+  className="rounded-xl font-black uppercase italic tracking-tighter text-[11px] h-10 px-4 bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20 active:scale-95 transition-all border-none"
+  onClick={clearHistory}
+>
+  <Trash2 className="w-4 h-4 mr-2" /> 
+  <span>XOÁ HẾT</span>
+</Button>
+
           </div>
         </div>
 
