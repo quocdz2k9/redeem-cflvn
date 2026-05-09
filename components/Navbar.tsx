@@ -75,10 +75,10 @@ export function Navbar() {
                 />
                 {/* MỤC MỚI: THƯ VIỆN VŨ KHÍ */}
                 <MenuLink
-                  href="/weapons"
+                  href="/weapon"
                   icon={<Sword className="w-4 h-4" />}
                   title="Thư viện Vũ khí"
-                  active={pathname === "/weapons"}
+                  active={pathname === "/weapon"}
                   onClick={() => setIsOpen(false)}
                 />
                 <MenuLink
