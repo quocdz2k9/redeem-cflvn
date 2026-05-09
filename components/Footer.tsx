@@ -1,6 +1,5 @@
 "use client"
-
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { ExternalLink } from "lucide-react"
 
 interface FooterProps {
@@ -10,6 +9,14 @@ interface FooterProps {
 }
 
 export function Footer({ mounted, currentYear, currentDomain }: FooterProps) {
+  const [hostname, setHostname] = useState("")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHostname(window.location.hostname)
+    }
+  }, [])
+
   return (
     <footer className="mt-auto pt-10 pb-[calc(20px+env(safe-area-inset-bottom))] border-t border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-black/20 backdrop-blur-sm">
       <div className="max-w-2xl mx-auto px-6 flex flex-col items-center gap-6">
@@ -29,7 +36,7 @@ export function Footer({ mounted, currentYear, currentDomain }: FooterProps) {
           </a>
           <div className="w-[1px] h-3 bg-zinc-300 dark:bg-zinc-700" />
           <a
-            href={mounted ? `mailto:contact@${window.location.hostname}` : "#"}
+            href={mounted && hostname ? `mailto:contact@${hostname}` : "#"}
             className="flex items-center gap-2 text-[12px] font-black uppercase tracking-tighter text-zinc-500 dark:text-zinc-400 hover:text-orange-600 dark:hover:text-orange-500 transition-colors"
           >
             <div className="w-6 h-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
