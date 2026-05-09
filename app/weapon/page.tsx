@@ -140,7 +140,7 @@ export default function WeaponsPage() {
     setLoading(true)
     setActiveTab("stats")
     try {
-      const res = await fetch(`/api/heroes/${id}`) // Đổi thành /api/weapons/${id} nếu Quốc đã đổi tên file route
+      const res = await fetch(`/api/weapons/${id}`) // Đổi thành /api/weapons/${id} nếu Quốc đã đổi tên file route
       const data = await res.json()
       if (data.title) setSelectedWeapon(data)
     } catch (e) {
