@@ -7,7 +7,7 @@ import {
   Trophy, Users, Clock, 
   Gem, Coins, Star, 
   Info, AlertCircle,
-  Gamepad2
+  Gamepad2, TrendingUp, History
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -51,19 +51,30 @@ export default function CheckRolePage() {
     return new Number(num).toLocaleString("vi-VN")
   }
 
+  const getTimeAgo = (timestamp: number) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = now - timestamp;
+    if (diff < 60) return "Vừa xong";
+    if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+    return new Date(timestamp * 1000).toLocaleDateString('vi-VN');
+  };
+
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 pb-20">
       <Navbar />
 
       <main className="max-w-2xl mx-auto p-4 mt-6 space-y-6">
+        {/* Header */}
         <div className="px-1 text-center mb-8">
           <span className="text-[10px] font-black uppercase text-orange-600 tracking-[0.3em]">Hệ thống tra cứu</span>
           <h1 className="text-3xl font-black italic uppercase tracking-tighter mt-1 leading-none">
             CHECK <span className="text-zinc-400">INFO</span> ACCOUNT
           </h1>
-          <p className="text-[11px] font-bold text-zinc-500 mt-2 uppercase">Nhập Role ID để kiểm tra thông tin nhân vật Crossfire: Legends</p>
+          <p className="text-[11px] font-bold text-zinc-500 mt-2 uppercase italic tracking-tight">Thông tin nhân vật thời gian thực từ VNG</p>
         </div>
 
+        {/* Input Search */}
         <form onSubmit={handleCheck} className="relative group">
           <Input
             placeholder="Nhập Role ID (VD: 1403552873)..."
@@ -75,9 +86,9 @@ export default function CheckRolePage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="h-12 px-6 rounded-[18px] bg-orange-600 hover:bg-orange-700 text-white font-black italic uppercase tracking-tighter transition-all active:scale-95"
+              className="h-12 px-6 rounded-[18px] bg-orange-600 hover:bg-orange-700 text-white font-black italic uppercase tracking-tighter transition-all active:scale-95 shadow-lg shadow-orange-600/20"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "KIỂM TRA"}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "TRA CỨU"}
             </Button>
           </div>
         </form>
@@ -92,8 +103,9 @@ export default function CheckRolePage() {
         {result && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
             <Card className="overflow-hidden border-none bg-white dark:bg-zinc-950 shadow-xl rounded-[32px] relative">
-              <div className="h-24 bg-gradient-to-r from-orange-600 to-rose-600 opacity-20 absolute top-0 left-0 w-full" />
+              <div className="h-28 bg-gradient-to-r from-orange-600 to-rose-600 opacity-20 absolute top-0 left-0 w-full" />
               
+              {/* Profile Section */}
               <div className="p-6 pt-10 relative z-10 flex flex-col items-center sm:flex-row sm:items-start gap-6">
                 <div className="relative shrink-0">
                   <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 border-white dark:border-zinc-900 shadow-2xl bg-zinc-100">
@@ -112,12 +124,12 @@ export default function CheckRolePage() {
                   <div className="flex items-center justify-center sm:justify-start gap-2">
                     <h2 className="text-2xl font-black uppercase italic tracking-tighter">{result.roleName}</h2>
                     {result.info.is_online === "1" && (
-                      <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" title="Đang Online" />
                     )}
                   </div>
                   <div className="flex flex-wrap justify-center sm:justify-start gap-3 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-orange-600" /> ID: {result.roleID}</span>
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3 text-blue-500" /> Guild: {result.info.guild_name || "Chưa vào Clan"}</span>
+                    <span className="flex items-center gap-1"><Users className="w-3 h-3 text-blue-500" /> Clan: {result.info.guild_name || "Chưa gia nhập"}</span>
                   </div>
                   <div className="pt-3 flex gap-2 justify-center sm:justify-start">
                      <div className="px-3 py-1.5 bg-zinc-50 dark:bg-zinc-900 rounded-xl border dark:border-zinc-800 flex items-center gap-2">
@@ -132,27 +144,37 @@ export default function CheckRolePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 border-t dark:border-zinc-900">
-                <StatBox icon={<Trophy />} colorClass="text-orange-500" label="Rank hiện tại" value={`ĐIỂM: ${result.info.ladder_score}`} />
-                <StatBox icon={<Star />} colorClass="text-yellow-500" label="Rank cao nhất" value={`ĐIỂM: ${result.info.top_ladder_score}`} />
-                <StatBox icon={<Clock />} colorClass="text-blue-500" label="Ngày tạo" value={new Date(result.info.register_time * 1000).toLocaleDateString('vi-VN')} />
-                <StatBox icon={<Info />} colorClass="text-zinc-400" label="Uy tín" value={`${result.info.credit_score}/100`} />
+              {/* Advanced Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 border-t dark:border-zinc-900">
+                <StatBox icon={<Trophy />} colorClass="text-orange-500" label="Rank Thường" value={`ĐIỂM: ${result.info.ladder_score}`} />
+                <StatBox icon={<Star />} colorClass="text-yellow-500" label="Rank Đỉnh Cao" value={`BẬC: ${result.info.peak_ladder_level}`} />
+                <StatBox icon={<TrendingUp />} colorClass="text-blue-500" label="Tổng EXP" value={formatNumber(result.info.exp)} />
+                <StatBox icon={<Clock />} colorClass="text-zinc-400" label="Ngày tạo" value={new Date(result.info.register_time * 1000).toLocaleDateString('vi-VN')} />
+                <StatBox icon={<History />} colorClass="text-purple-500" label="Đăng nhập" value={getTimeAgo(result.info.lastlogintime)} />
+                <StatBox icon={<Info />} colorClass="text-emerald-500" label="Uy tín" value={`${result.info.credit_score}/100`} />
+              </div>
+
+              {/* Version Footer */}
+              <div className="px-6 py-3 bg-zinc-50 dark:bg-zinc-900/50 flex justify-between items-center border-t dark:border-zinc-900">
+                <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-tight">Phiên bản login lần cuối:</span>
+                <span className="text-[10px] font-black text-orange-600 italic">v{result.info.last_login_version}</span>
               </div>
             </Card>
 
-            <div className="bg-orange-600 rounded-[24px] p-4 text-white flex items-center justify-between">
+            {/* Server Info Card */}
+            <div className="bg-orange-600 rounded-[24px] p-4 text-white flex items-center justify-between shadow-lg shadow-orange-600/20">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                   <Gamepad2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[9px] font-black uppercase opacity-60">Trạng thái máy chủ</p>
-                  <p className="text-[11px] font-bold uppercase tracking-tighter italic">Server: {result.serverName} (Global)</p>
+                  <p className="text-[9px] font-black uppercase opacity-60">Khu vực máy chủ</p>
+                  <p className="text-[11px] font-bold uppercase tracking-tighter italic">Server: {result.serverName} (VNG Games)</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[9px] font-black uppercase opacity-60">Cập nhật lúc</p>
-                <p className="text-[11px] font-bold uppercase italic">Vừa xong</p>
+                <p className="text-[9px] font-black uppercase opacity-60">Tình trạng</p>
+                <p className="text-[11px] font-bold uppercase italic">Ổn định</p>
               </div>
             </div>
           </div>
@@ -162,18 +184,16 @@ export default function CheckRolePage() {
   )
 }
 
-// Fix lỗi Type check tại đây bằng cách truyền class qua Props thay vì cloneElement phức tạp
 function StatBox({ icon, colorClass, label, value }: { icon: React.ReactNode, colorClass: string, label: string, value: string }) {
   return (
-    <div className="p-4 flex flex-col items-center justify-center text-center gap-1 border-r last:border-r-0 dark:border-zinc-900">
+    <div className="p-4 flex flex-col items-center justify-center text-center gap-1 border-r border-b last:border-r-0 dark:border-zinc-900">
       <div className="p-2 bg-zinc-50 dark:bg-zinc-900 rounded-lg mb-1">
         {React.isValidElement(icon) 
           ? React.cloneElement(icon as React.ReactElement<any>, { className: `w-4 h-4 ${colorClass}` }) 
           : icon}
       </div>
       <p className="text-[8px] font-black uppercase text-zinc-400 tracking-widest">{label}</p>
-      <p className="text-[10px] font-black uppercase italic tracking-tighter">{value}</p>
+      <p className="text-[10px] font-black uppercase italic tracking-tighter line-clamp-1">{value}</p>
     </div>
   )
 }
-
