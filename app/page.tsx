@@ -175,13 +175,16 @@ export default function Home() {
     }
   }
 
-  const handleRedeem = async () => {
+   const handleRedeem = async () => {
     if (!roleId) return toast.error("Vui lòng chọn ID nhân vật")
     const listCodes = codesInput.split("\n").map(c => c.trim()).filter(c => c !== "")
     if (listCodes.length === 0) return toast.error("Danh sách code trống")
 
     setIsLoading(true)
     setLogs([])
+
+    // 1. Chuẩn bị mảng để lưu vào history sau khi chạy xong
+    const newHistoryEntries: any[] = []
 
     for (const code of listCodes) {
       const currentTime = new Date().toLocaleTimeString('vi-VN', { hour12: false })
@@ -190,30 +193,62 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            _targetServerId: "101", serverId: "101", gameCode: "A49",
-            roleId, roleName: roleName || roleId, code
+            _targetServerId: "101",
+            serverId: "101",
+            gameCode: "A49",
+            roleId,
+            roleName: roleName || roleId,
+            code
           })
         })
         const result = await response.json()
         const rawMsg = result.message || "Unknown"
-        
-        setLogs(prev => [{
+        const status = rawMsg === "Success" ? "Thành công" : "Thất bại"
+        const msg = ERROR_MESSAGES[rawMsg] || rawMsg
+
+        // Cập nhật log hiển thị ngay lập tức trên màn hình
+        setLogs(prev => [{ code, status, msg, time: currentTime }, ...prev])
+
+        // Thêm vào mảng tạm để lưu vào LocalStorage sau này
+        newHistoryEntries.push({
           code,
-          status: rawMsg === "Success" ? "Thành công" : "Thất bại",
-          msg: ERROR_MESSAGES[rawMsg] || rawMsg,
-          time: currentTime
-        }, ...prev])
+          status,
+          msg,
+          time: currentTime,
+          date: new Date().toLocaleDateString('vi-VN'),
+          roleId,
+          roleName: roleName || roleId
+        })
+
         await new Promise(r => setTimeout(r, 300))
       } catch {
-        setLogs(prev => [{ code, status: "Lỗi", msg: "Lỗi mạng", time: currentTime }, ...prev])
+        const errorLog = { code, status: "Lỗi", msg: "Lỗi mạng", time: currentTime }
+        setLogs(prev => [errorLog, ...prev])
+        
+        newHistoryEntries.push({
+          ...errorLog,
+          date: new Date().toLocaleDateString('vi-VN'),
+          roleId,
+          roleName: roleName || roleId
+        })
       }
     }
 
-    await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: 1 })
+    // 2. Sau khi chạy xong vòng lặp, lưu tất cả vào localStorage "cfl_redeem_history"
+    try {
+      const existingHistory = JSON.parse(localStorage.getItem("cfl_redeem_history") || "[]")
+      // Đưa những mã mới nhất lên đầu danh sách
+      const updatedHistory = [...newHistoryEntries, ...existingHistory].slice(0, 500)
+      localStorage.setItem("cfl_redeem_history", JSON.stringify(updatedHistory))
+    } catch (e) {
+      console.error("Lưu lịch sử thất bại", e)
+    }
 
+    await supabase.rpc('increment_redeem_count', { row_key: 'total_redeems', inc_by: 1 })
     setIsLoading(false)
     toast.success("Xử lý hoàn tất!")
   }
+
 
   const currentDomain = mounted ? window.location.hostname.toUpperCase() : ""
   const currentYear = mounted ? new Date().getFullYear() : 2026
