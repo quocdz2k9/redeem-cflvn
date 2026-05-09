@@ -12,7 +12,8 @@ import {
   UserCircle,
   Home,
   Shield,
-  Sword // Thêm icon Sword cho thư viện vũ khí
+  Sword,
+  Map as MapIcon // Import icon cho Maps
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -28,8 +29,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 
 export function Navbar() {
@@ -73,12 +74,19 @@ export function Navbar() {
                   active={pathname === "/heros"}
                   onClick={() => setIsOpen(false)}
                 />
-                {/* MỤC MỚI: THƯ VIỆN VŨ KHÍ */}
                 <MenuLink
                   href="/weapon"
                   icon={<Sword className="w-4 h-4" />}
                   title="Thư viện Vũ khí"
                   active={pathname === "/weapon"}
+                  onClick={() => setIsOpen(false)}
+                />
+                {/* MỤC MỚI: THƯ VIỆN MAPS */}
+                <MenuLink
+                  href="/maps"
+                  icon={<MapIcon className="w-4 h-4" />}
+                  title="Thư viện Maps"
+                  active={pathname === "/maps"}
                   onClick={() => setIsOpen(false)}
                 />
                 <MenuLink
@@ -144,7 +152,9 @@ export function Navbar() {
                 </div>
                 ỦNG HỘ ADMIN
               </DialogTitle>
-              <DialogDescription className="text-[11px] font-bold">Mời admin một ly cà phê nhé!</DialogDescription>
+              <DialogDescription className="text-[11px] font-bold text-center">
+                Mời admin một ly cà phê để duy trì hệ thống nhé!
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center p-6 pt-2">
               <img src="https://img.vietqr.io/image/VPB-0825966162-compact.png" alt="QR" className="w-44 h-44 rounded-2xl border bg-white p-1 mb-4" />
@@ -183,7 +193,7 @@ function MenuLink({
           ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2"
           : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-orange-600"
       }`}>
-        <div className={`${active ? "text-white" : "text-zinc-400 group-hover:text-orange-600"}`}>
+        <div className={`${active ? "text-white" : "text-zinc-400"}`}>
           {icon}
         </div>
         {title}
@@ -191,4 +201,3 @@ function MenuLink({
     </Link>
   )
 }
-
