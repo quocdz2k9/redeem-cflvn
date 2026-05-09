@@ -1,16 +1,18 @@
 "use client"
-import React, { useState } from "react" // Thêm useState
+
+import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { 
-  LayoutDashboard, 
-  Menu, 
-  Coffee, 
-  Heart, 
-  History, 
-  UserCircle, 
-  Home, 
-  Shield 
+import {
+  LayoutDashboard,
+  Menu,
+  Coffee,
+  Heart,
+  History,
+  UserCircle,
+  Home,
+  Shield,
+  Sword // Thêm icon Sword cho thư viện vũ khí
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -32,13 +34,11 @@ import {
 
 export function Navbar() {
   const pathname = usePathname()
-  // Quản lý trạng thái đóng/mở của Sheet
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-950 border-b dark:border-zinc-800 sticky top-0 z-50">
       <div className="flex items-center gap-3">
-        {/* Truyền open và onOpenChange vào Sheet */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-xl lg:hidden active:scale-95 transition-transform">
@@ -59,33 +59,40 @@ export function Navbar() {
               </SheetHeader>
 
               <div className="flex flex-col gap-2">
-                {/* Khi bấm vào MenuLink thì gọi setIsOpen(false) để đóng menu */}
-                <MenuLink 
-                  href="/" 
-                  icon={<Home className="w-4 h-4" />} 
-                  title="Trang chủ" 
-                  active={pathname === "/"} 
+                <MenuLink
+                  href="/"
+                  icon={<Home className="w-4 h-4" />}
+                  title="Trang chủ"
+                  active={pathname === "/"}
                   onClick={() => setIsOpen(false)}
                 />
-                <MenuLink 
-                  href="/heros" 
-                  icon={<UserCircle className="w-4 h-4" />} 
-                  title="Thư viện Heroes" 
-                  active={pathname === "/heros"} 
+                <MenuLink
+                  href="/heros"
+                  icon={<UserCircle className="w-4 h-4" />}
+                  title="Thư viện Heroes"
+                  active={pathname === "/heros"}
                   onClick={() => setIsOpen(false)}
                 />
-                <MenuLink 
-                  href="/history" 
-                  icon={<History className="w-4 h-4" />} 
-                  title="Lịch sử nhập code" 
-                  active={pathname === "/history"} 
+                {/* MỤC MỚI: THƯ VIỆN VŨ KHÍ */}
+                <MenuLink
+                  href="/weapons"
+                  icon={<Sword className="w-4 h-4" />}
+                  title="Thư viện Vũ khí"
+                  active={pathname === "/weapons"}
                   onClick={() => setIsOpen(false)}
                 />
-                <MenuLink 
-                  href="/policy" 
-                  icon={<Shield className="w-4 h-4" />} 
-                  title="Chính sách bảo mật" 
-                  active={pathname === "/policy"} 
+                <MenuLink
+                  href="/history"
+                  icon={<History className="w-4 h-4" />}
+                  title="Lịch sử nhập code"
+                  active={pathname === "/history"}
+                  onClick={() => setIsOpen(false)}
+                />
+                <MenuLink
+                  href="/policy"
+                  icon={<Shield className="w-4 h-4" />}
+                  title="Chính sách bảo mật"
+                  active={pathname === "/policy"}
                   onClick={() => setIsOpen(false)}
                 />
               </div>
@@ -150,33 +157,31 @@ export function Navbar() {
             </div>
           </DialogContent>
         </Dialog>
-        
         <ThemeToggle />
       </div>
     </nav>
   )
 }
 
-// Update MenuLink để nhận thêm prop onClick
-function MenuLink({ 
-  href, 
-  icon, 
-  title, 
-  active = false, 
-  onClick 
-}: { 
-  href: string, 
-  icon: React.ReactNode, 
-  title: string, 
+function MenuLink({
+  href,
+  icon,
+  title,
+  active = false,
+  onClick
+}: {
+  href: string,
+  icon: React.ReactNode,
+  title: string,
   active?: boolean,
   onClick?: () => void
 }) {
   return (
     <Link href={href} onClick={onClick}>
       <div className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-bold transition-all duration-200 active:scale-95 ${
-        active 
-        ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2" 
-        : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-orange-600"
+        active
+          ? "bg-orange-600 text-white shadow-lg shadow-orange-600/20 translate-x-2"
+          : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-orange-600"
       }`}>
         <div className={`${active ? "text-white" : "text-zinc-400 group-hover:text-orange-600"}`}>
           {icon}
